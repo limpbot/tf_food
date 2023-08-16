@@ -58,7 +58,7 @@ for element in menu_elements:
 if len(swfr_flugplatz_essen) > 0:
     dict_mensa_essen['SWFR Flugplatz'] = swfr_flugplatz_essen
 else:
-    dict_mensa_essen['SWFR Flugplatz'] = ['Heute kein Essen.']
+    dict_mensa_essen['SWFR Flugplatz'] = ['Empty plate.']
 
 url = 'https://www.ipm.fraunhofer.de/de/ueber-fraunhofer-ipm/fraunhofer-ipm-kantine.html'
 response = requests.get(url)
@@ -88,7 +88,7 @@ for row in rows:
 if len(fraunhofer_ipm_essen) > 0:
     dict_mensa_essen['Fraunhofer IPM'] = fraunhofer_ipm_essen
 else:
-    dict_mensa_essen['Fraunhofer IPM'] = ['Heute kein Essen.']
+    dict_mensa_essen['Fraunhofer IPM'] = ['Empty plate.']
 
 # pip install torch
 # pip install --upgrade diffusers transformers accelerate
