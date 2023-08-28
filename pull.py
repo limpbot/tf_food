@@ -1,5 +1,6 @@
 import logging
 logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 # pip install requests
 # pip install bs4
 import requests
@@ -7,8 +8,6 @@ from bs4 import BeautifulSoup
 import datetime
 import re
 import html
-
-
 
 def get_todays_weekday():
 
