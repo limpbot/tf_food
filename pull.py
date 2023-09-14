@@ -7,7 +7,10 @@ import requests
 from bs4 import BeautifulSoup
 import datetime
 import re
-import html
+
+
+#PATH_HTML = '/misc/lmbweb/htdocs/people/sommerl/essen/'
+PATH_HTML = '/misc/lmbweb/essen/'
 
 def get_todays_weekday():
 
@@ -216,18 +219,13 @@ def run_cmd(cmd, logger, live=False, background=False):
         else:
             subprocess.run(cmd, capture_output=False, shell=True)
 
-run_cmd('cp ./index.html /misc/lmbweb/htdocs/people/sommerl/essen/', live=True, logger=logger)
-run_cmd(f'rm /misc/lmbweb/htdocs/people/sommerl/essen/*.jpg', live=True, logger=logger)
+run_cmd(f'cp ./index.html {PATH_HTML}', live=True, logger=logger)
+run_cmd(f'rm {PATH_HTML}*.jpg', live=True, logger=logger)
 
 
 for mensa in dict_mensa_essen.keys():
     for i, essen in enumerate(dict_mensa_essen[mensa]):
-        run_cmd(f'cp "./{todays_date}_{mensa}_{i}.jpg" /misc/lmbweb/htdocs/people/sommerl/essen/', live=True, logger=logger)
+        run_cmd(f'cp "./{todays_date}_{mensa}_{i}.jpg" {PATH_HTML}', live=True, logger=logger)
 
 run_cmd(f'rm *.jpg', live=True, logger=logger)
 run_cmd(f'rm *.html', live=True, logger=logger)
-
-#run_cmd('scp ./index.html pi@10.126.142.128:~/html', live=True, logger=logger)
-#for mensa in dict_mensa_essen.keys():
-#    for i, essen in enumerate(dict_mensa_essen[mensa]):
-#        run_cmd(f'scp "./{todays_date}_{mensa}_{i}.jpg" pi@10.126.142.128:~/html', live=True, logger=logger)
