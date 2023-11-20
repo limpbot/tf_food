@@ -133,3 +133,10 @@ exit 0
     #subprocess.run(f'scp {tmp_script_fpath} torque:{tmp_script_fpath}', capture_output=True, shell=True)
     #subprocess.run(f'scp {tmp_config_fpath} torque:{tmp_config_fpath}', capture_output=True, shell=True)
     subprocess.run(f'ssh torque "cd torque_jobs && qsub {remote_tmp_script_fpath}"', capture_output=True, shell=True)
+
+def main():
+    cfg = OmegaConf.load('config.yaml')
+    bench_single_method_torque(cfg)
+
+if __name__ == "__main__":
+    main()
