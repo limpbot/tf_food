@@ -8,9 +8,44 @@ from bs4 import BeautifulSoup
 import datetime
 import re
 
+def get_todays_date():
+    now = datetime.datetime.now()
+    timestamp = now.strftime("%d-%m") # _%H-%M-%S
+    return timestamp
+
 
 #PATH_HTML = '/misc/lmbweb/htdocs/people/sommerl/essen/'
 PATH_HTML = '/misc/lmbweb/essen/'
+
+german_weekdays_offsets ={
+    'Montag': 0,
+    'Dienstag': 1,
+    'Mittwoch': 2,
+    'Donnerstag': 3,
+    'Freitag': 4,
+    'Samstag': 5,
+    'Sonntag': 6,
+}
+
+german_month_names = {
+    'Januar': 1,
+    'Februar': 2,
+    'März': 3,
+    'April': 4,
+    'Mai': 5,
+    'Juni': 6,
+    'Juli': 7,
+    'August': 8,
+    'September': 9,
+    'Oktober': 10,
+    'November': 11,
+    'Dezember': 12
+}
+
+def get_todays_year():
+    # Get today's date
+    today = datetime.datetime.now()
+    return today.year
 
 def get_todays_weekday():
 
@@ -30,7 +65,7 @@ def get_todays_weekday():
 todays_weekday = get_todays_weekday()
 todays_date = datetime.datetime.now().strftime('%Y-%m-%d')
 dict_mensa_essen = {}
-
+dict_mensa_date = {}
 
 
 url = 'https://www.swfr.de/essen/mensen-cafes-speiseplaene/freiburg/mensa-flugplatz'
@@ -41,9 +76,8 @@ soup = BeautifulSoup(html_content, 'html.parser')
 
 menu_elements = soup.select('.menu-tagesplan')
 
-
-
 swfr_flugplatz_essen = []
+swfr_flugplatz_date = []
 for element in menu_elements:
     essen_weekday = element.find('h3').get_text()
     if todays_weekday not in essen_weekday:
@@ -54,13 +88,17 @@ for element in menu_elements:
         try:
             essen = element_essen.get_text(separator=', ')
             swfr_flugplatz_essen.append(essen)
+            date = essen_weekday.split(' ')[-1]
+            swfr_flugplatz_date.append(date)
         except Exception as e:
             pass
 
 if len(swfr_flugplatz_essen) > 0:
     dict_mensa_essen['SWFR Flugplatz'] = swfr_flugplatz_essen
+    dict_mensa_date['SWFR Flugplatz'] = swfr_flugplatz_date
 else:
     dict_mensa_essen['SWFR Flugplatz'] = ['Empty plate.']
+    dict_mensa_date['SWFR Flugplatz'] = [get_todays_date()]
 
 url = 'https://www.ipm.fraunhofer.de/de/ueber-fraunhofer-ipm/fraunhofer-ipm-kantine.html'
 response = requests.get(url)
@@ -70,8 +108,11 @@ soup = BeautifulSoup(html_content, 'html.parser')
 tab_par_element = soup.select('.tabPar')[0] #.first()
 rows = tab_par_element.find_all('tr')
 
-fraunhofer_ipm_essen = []
+week_monday_day_in_month, week_monday_month = re.match('([0-9]+)[^A-Za-z]* ([A-Za-z]+) .*', tab_par_element.find_all('h4')[0].get_text() + ' Dezember ').groups()
+week_monday_month = german_month_names[week_monday_month]
 
+fraunhofer_ipm_essen = []
+fraunhofer_ipm_date = []
 for row in rows:
     essens_infos = row.find_all('td')
 
@@ -81,6 +122,9 @@ for row in rows:
             continue
 
         for essen_info in essens_infos[1].find_all('li'):
+            date = datetime.datetime(year=int(get_todays_year()), month=week_monday_month, day=int(week_monday_day_in_month)) + datetime.timedelta(days=german_weekdays_offsets[weekday.split(' ')[0]])
+            date = date.strftime("%d.%m.")
+            fraunhofer_ipm_date.append(date)
             essen = essen_info.get_text().replace('\xa0', '')
             essen = re.sub(r'\[.*?\]', '', essen)
             fraunhofer_ipm_essen.append(essen)
@@ -89,8 +133,11 @@ for row in rows:
 
 if len(fraunhofer_ipm_essen) > 0:
     dict_mensa_essen['Fraunhofer IPM'] = fraunhofer_ipm_essen
+    dict_mensa_date['Fraunhofer IPM'] = fraunhofer_ipm_date
 else:
     dict_mensa_essen['Fraunhofer IPM'] = ['Empty plate.']
+    dict_mensa_date['Fraunhofer IPM'] = [get_todays_date()]
+
 
 # pip install torch
 # pip install --upgrade diffusers transformers accelerate
@@ -141,9 +188,10 @@ for mensa in dict_mensa_essen.keys():
         <ul  class="grid-list">
         """
     for i, essen in enumerate(dict_mensa_essen[mensa]):
+        date = dict_mensa_date[mensa][i]
         html_text += f"""
         <li>
-            {essen} <br>
+            {essen} ({date}) <br>
             <img width="25%" src="./{todays_date}_{mensa}_{i}.jpg" alt="Local Image">
             <br>
         </li>

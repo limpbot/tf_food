@@ -2,7 +2,7 @@
 # pip install bs4
 # pip install torch
 # pip install --upgrade diffusers transformers accelerate
-
+# pip install omegaconf
 
 
 cd /home/sommerl/PycharmProjects/lmb-rpi && source venv/bin/activate && python pull.py
