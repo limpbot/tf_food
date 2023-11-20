@@ -11,7 +11,7 @@ platform:
   #path_exps: /misc/lmbraid19/sommerl/exps
   #path_datasets: /misc/lmbraid19/sommerl/datasets
   #path_exps: /misc/lmbraid19/sommerl/exps
-  path_cuda: /misc/software/cuda/cuda-11.7
+  path_cuda: /misc/software/cuda/cuda-11.1
   path_home: /home/sommerl
   url_od3d: git@github.com:lmb-freiburg/meal2023.git
   username: sommerl
@@ -30,6 +30,6 @@ platform_local:
   #path_datasets: /misc/lmbraid19/sommerl/datasets
   #path_exps: /misc/lmbraid19/sommerl/exps
   #path_cudas: /scratch/sommerl/cudas
-  path_cuda: /misc/software/cuda/cuda-11.7
+  path_cuda: /misc/software/cuda/cuda-11.1
   url_od3d: git@github.com:lmb-freiburg/meal2023.git
 

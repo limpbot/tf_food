@@ -1,10 +1,6 @@
-# pip install requests
-# pip install bs4
-# pip install torch
-# pip install --upgrade diffusers transformers accelerate
-# pip install omegaconf
-
-
+# 
+# https://download.pytorch.org/whl/cu111/torch_stable.html
+# 
 cd /home/sommerl/PycharmProjects/lmb-rpi && source venv/bin/activate && python pull.py
 
 crontab -e
