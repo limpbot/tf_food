@@ -3,7 +3,7 @@ branch: main
 
 platform:
   link: torque
-  path_od3d: /misc/lmbweb/essen
+  path_od3d: /home/sommerl/PycharmProjects/lmb-rpi
   pull_od3d: True
   pull_od3d_submodules: True
   install_od3d: True
@@ -24,7 +24,7 @@ platform_local:
   link: local
   path_home: /home/sommerl
   path_logs: /home/sommerl
-  path_od3d: /misc/lmbweb/essen
+  path_od3d: /home/sommerl/PycharmProjects/lmb-rpi
   #path_datasets: /scratch/sommerl/datasets
   #path_exps: /scratch/sommerl/exps
   #path_datasets: /misc/lmbraid19/sommerl/datasets
