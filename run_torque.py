@@ -32,7 +32,7 @@ def bench_single_method_torque(cfg: DictConfig):
         walltime = cfg.platform.walltime
 
         gpu_cfg_str = f':gpus={gpu_count}' if gpu_count > 0 else ""
-        cuda_cfg_str = f':nvidiaMinCC75' if gpu_count > 0 else ""
+        cuda_cfg_str = f':nvidiaMinCC86' if gpu_count > 0 else "" # nvidiaMinCC75
 
         if cfg.platform.pull_od3d:
             pull_od3d_cmds_str = f'''
