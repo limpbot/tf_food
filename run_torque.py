@@ -55,9 +55,7 @@ git submodule foreach 'git fetch origin; git checkout $(git rev-parse --abbrev-r
         if cfg.platform.install_od3d:
             install_od3d_cmds_str = f'''
 pip install pip --upgrade
-pip install torch
-FORCE_CUDA=1 pip install "git+https://github.com/facebookresearch/pytorch3d.git@stable"
-pip install -e {cfg.platform.path_od3d}
+pip install -r {cfg.platform.path_od3d}/requirements.txt
             '''
         else:
             install_od3d_cmds_str = ''
