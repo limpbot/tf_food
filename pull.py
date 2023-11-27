@@ -15,7 +15,8 @@ def get_todays_date():
 
 
 #PATH_HTML = '/misc/lmbweb/htdocs/people/sommerl/essen/'
-PATH_HTML = '/misc/lmbweb/essen/'
+#PATH_HTML = '/misc/lmbweb/essen/'
+PATH_HTML = '/home/lmbserverstats/tools-and-services/tf_food/html'
 
 german_weekdays_offsets ={
     'Montag': 0,
