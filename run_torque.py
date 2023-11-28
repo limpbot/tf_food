@@ -1,26 +1,52 @@
 import subprocess
-from omegaconf import DictConfig, OmegaConf
+from pathlib import Path
 
-def bench_single_method_torque(cfg: DictConfig):
+
+class ConfigPlatform():
+    def __int__(self):
+        self.link = "torque"
+        self.path_od3d = "/home/lmbserverstats/tools-and-services/tf_food"
+        self.pull_od3d = True
+        self.pull_od3d_submodules = True
+        self.install_od3d = True
+        self.path_cuda = "/misc/software/cuda/cuda-11.1"
+        self.path_home = "/home/lmbserverstats"
+        self.url_od3d = 'git@github.com:lmb-freiburg/meal2023.git'
+        self.username = "lmbserverstats"
+        self.gpu_count = 1
+        self.cpu_count = 8
+        self.ram = "40gb"
+        self.walltime = "24:00:00"
+
+class ConfigPlatformLocal():
+    def __int__(self):
+        self.link = "local"
+        self.path_home = "/home/lmbserverstats"
+        self.path_logs = "/home/lmbserverstats"
+        self.path_od3d = "/home/lmbserverstats/tools-and-services/tf_food"
+        self.path_cuda = "/misc/software/cuda/cuda-11.1"
+        self.url_od3d = 'git@github.com:lmb-freiburg/meal2023.git'
+
+class Config:
+    def __init__(self):
+        self.run_name = "lunch"
+        self.branch = "main"
+        self.platform_local = ConfigPlatformLocal()
+        self.platform = ConfigPlatform()
+
+def bench_single_method_torque():
     # 1. save config
     # 2. setup od3d on torque
     # 3. execute script with command: run od3d bench single -f `path-to-config`
     # TODO
+    cfg = Config()
 
     job_name = cfg.run_name
 
-    from pathlib import Path
-    local_tmp_config_fpath = Path(cfg.platform_local.path_home).joinpath('tmp', f'config_{job_name}.yaml') # .resolve() # .resolve()
-    if not local_tmp_config_fpath.resolve().parent.exists():
-        local_tmp_config_fpath.parent.mkdir(parents=True)
-    with open(local_tmp_config_fpath.resolve(), 'w') as fp:
-        OmegaConf.save(config=cfg, f=fp)
     local_tmp_script_fpath = Path(cfg.platform_local.path_home).joinpath('tmp', f'run_{job_name}.sh') # .resolve()
     if not local_tmp_script_fpath.parent.exists():
         local_tmp_script_fpath.parent.mkdir(parents=True)
 
-
-    remote_tmp_config_fpath = Path(cfg.platform.path_home).joinpath('tmp', f'config_{job_name}.yaml')
     remote_tmp_script_fpath = Path(cfg.platform.path_home).joinpath('tmp', f'run_{job_name}.sh')
 
     with open(local_tmp_script_fpath, 'w') as rsh:
@@ -133,8 +159,7 @@ exit 0
     subprocess.run(f'ssh torque "cd torque_jobs && qsub {remote_tmp_script_fpath}"', capture_output=True, shell=True)
 
 def main():
-    cfg = OmegaConf.load('config.yaml')
-    bench_single_method_torque(cfg)
+    bench_single_method_torque()
 
 if __name__ == "__main__":
     main()
