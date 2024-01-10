@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 import datetime
 import re
 import sys
+from pathlib import Path
 
 if len(sys.argv) > 1:
     PATH_HTML = sys.argv[1]
@@ -270,6 +271,9 @@ def run_cmd(cmd, logger, live=False, background=False):
             return res.stdout.decode("utf-8")
         else:
             subprocess.run(cmd, capture_output=False, shell=True)
+
+if not Path(PATH_HTML).exists():
+    Path(PATH_HTML).mkdir(parents=True)
 
 run_cmd(f'cp ./index.html {PATH_HTML}', live=True, logger=logger)
 run_cmd(f'rm {PATH_HTML}*.jpg', live=True, logger=logger)
