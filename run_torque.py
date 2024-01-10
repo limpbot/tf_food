@@ -7,9 +7,11 @@ path_git_repo = "/home/" + lmb_username +"/tools-and-services/tf_food"
 path_cuda = "/misc/software/cuda/cuda-11.7"
 path_home = "/home/" + lmb_username
 path_logs = "/home/" + lmb_username
+path_html = '/home/' + lmb_username + '/tools-and-services/tf_food/html'
 
 class ConfigPlatform():
     link = "torque"
+    path_html = path_html
     path_git_repo = path_git_repo
     pull_git_repo = True
     pull_git_repo_submodules = True
@@ -149,7 +151,7 @@ fi
 
 rm "{cfg.platform.path_git_repo}/installing.txt"
 
-python pull.py
+python pull.py {cfg.platform.path_html}
 
 #PYTHONUNBUFFERED=1 
 #CUDA_VISIBLE_DEVICES=1

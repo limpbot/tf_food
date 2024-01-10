@@ -7,6 +7,12 @@ import requests
 from bs4 import BeautifulSoup
 import datetime
 import re
+import sys
+
+if len(sys.argv) > 1:
+    PATH_HTML = sys.argv[1]
+else:
+    PATH_HTML = '/home/lmbserverstats/tools-and-services/tf_food/html'
 
 def get_todays_date():
     now = datetime.datetime.now()
@@ -14,9 +20,6 @@ def get_todays_date():
     return timestamp
 
 
-#PATH_HTML = '/misc/lmbweb/htdocs/people/sommerl/essen/'
-#PATH_HTML = '/misc/lmbweb/essen/'
-PATH_HTML = '/home/lmbserverstats/tools-and-services/tf_food/html'
 
 german_weekdays_offsets ={
     'Montag': 0,
