@@ -15,7 +15,7 @@ class ConfigPlatform():
     path_git_repo = path_git_repo
     pull_git_repo = True
     pull_git_repo_submodules = True
-    install_git_repo = False
+    install_git_repo = True
     path_cuda = path_cuda
     path_home = path_home
     url_git_repo = url_git_repo
