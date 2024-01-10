@@ -83,8 +83,8 @@ git submodule foreach 'git fetch origin; git checkout $(git rev-parse --abbrev-r
 
         if cfg.platform.install_git_repo:
             install_git_repo_cmds_str = f'''
-pip install pip --upgrade
-pip install -r {cfg.platform.path_git_repo}/requirements.txt
+pip3 install pip --upgrade
+pip3 install -r {cfg.platform.path_git_repo}/requirements.txt
             '''
         else:
             install_git_repo_cmds_str = ''
