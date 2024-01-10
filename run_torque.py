@@ -3,11 +3,11 @@ from pathlib import Path
 
 lmb_username="sommerl" # "lmbserverstats" "sommerl"
 url_git_repo='git@github.com:limpbot/tf_food.git'
-path_git_repo = "/home/" + lmb_username +"/tools-and-services/tf_food"
+path_git_repo = "/home/" + lmb_username + "/tools-and-services/tf_food"
 path_cuda = "/misc/software/cuda/cuda-11.7"
 path_home = "/home/" + lmb_username
 path_logs = "/home/" + lmb_username
-path_html = '/home/' + lmb_username + '/tools-and-services/tf_food/html'
+path_html = '/home/' + lmb_username + '/tools-and-services/tf_food/html/'
 
 class ConfigPlatform():
     link = "torque"
@@ -15,7 +15,7 @@ class ConfigPlatform():
     path_git_repo = path_git_repo
     pull_git_repo = True
     pull_git_repo_submodules = True
-    install_git_repo = True
+    install_git_repo = False
     path_cuda = path_cuda
     path_home = path_home
     url_git_repo = url_git_repo

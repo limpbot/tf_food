@@ -12,7 +12,7 @@ import sys
 if len(sys.argv) > 1:
     PATH_HTML = sys.argv[1]
 else:
-    PATH_HTML = '/home/lmbserverstats/tools-and-services/tf_food/html'
+    PATH_HTML = '/home/lmbserverstats/tools-and-services/tf_food/html/'
 
 def get_todays_date():
     now = datetime.datetime.now()
