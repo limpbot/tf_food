@@ -1,5 +1,5 @@
 import subprocess
-from pathlib import Path
+import os
 
 lmb_username="sommerl" # "lmbserverstats" "sommerl"
 url_git_repo='git@github.com:limpbot/tf_food.git'
@@ -39,6 +39,14 @@ class Config:
     platform_local = ConfigPlatformLocal()
     platform = ConfigPlatform()
 
+def create_parent_directories(fpath):
+    # Extract the directory part of the file path
+    directory = os.path.dirname(fpath)
+
+    # Check if the directory exists, and create it if not
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
 def bench_single_method_torque():
     # 1. save config
     # 2. setup git_repo on torque
@@ -48,34 +56,31 @@ def bench_single_method_torque():
 
     job_name = cfg.run_name
 
-    local_tmp_script_fpath = Path(cfg.platform_local.path_home).joinpath('tmp', f'run_{job_name}.sh') # .resolve()
-    if not local_tmp_script_fpath.parent.exists():
-        local_tmp_script_fpath.parent.mkdir(parents=True)
-
-    remote_tmp_script_fpath = Path(cfg.platform.path_home).joinpath('tmp', f'run_{job_name}.sh')
+    local_tmp_script_fpath = cfg.platform_local.path_home + '/tmp/run_' + job_name + '.sh'
+    create_parent_directories(local_tmp_script_fpath)
+    remote_tmp_script_fpath = cfg.platform.path_home + '/tmp/run_' + job_name + '.sh'
 
     with open(local_tmp_script_fpath, 'w') as rsh:
-
         gpu_count = cfg.platform.gpu_count
         node_count = 1
         cpu_count = cfg.platform.cpu_count
         ram = cfg.platform.ram
         walltime = cfg.platform.walltime
 
-        gpu_cfg_str = f':gpus={gpu_count}' if gpu_count > 0 else ""
-        cuda_cfg_str = f':nvidiaMinCC86' if gpu_count > 0 else "" # nvidiaMinCC75
+        gpu_cfg_str = ':gpus=' + str(gpu_count) if gpu_count > 0 else ""
+        cuda_cfg_str = ':nvidiaMinCC89' if gpu_count > 0 else "" # nvidiaMinCC75 , nvidiaMinCC86, nvidiaMinCC89
 
         if cfg.platform.pull_git_repo:
-            pull_git_repo_cmds_str = f'''
+            pull_git_repo_cmds_str = '''
 git fetch 
-git checkout {cfg.branch}
+git checkout {}
 git pull
-            '''
+            '''.format(cfg.branch)
         else:
             pull_git_repo_cmds_str = ''
 
         if cfg.platform.pull_git_repo_submodules:
-            pull_git_repo_submodules_cmds_str = f'''
+            pull_git_repo_submodules_cmds_str = '''
 git submodule init
 git submodule update
 git submodule foreach 'git fetch origin; git checkout $(git rev-parse --abbrev-ref HEAD); git reset --hard origin/$(git rev-parse --abbrev-ref HEAD); git submodule update --recursive; git clean -dfx'
@@ -84,20 +89,19 @@ git submodule foreach 'git fetch origin; git checkout $(git rev-parse --abbrev-r
             pull_git_repo_submodules_cmds_str = ''
 
         if cfg.platform.install_git_repo:
-            install_git_repo_cmds_str = f'''
+            install_git_repo_cmds_str = '''
 pip3 install pip --upgrade
-pip3 install -r {cfg.platform.path_git_repo}/requirements.txt
-            '''
+pip3 install -r {}/requirements.txt
+            '''.format(cfg.platform.path_git_repo)
         else:
             install_git_repo_cmds_str = ''
-
-        script_as_string = f'''#!/bin/bash
-#PBS -N {job_name}
+        script_as_string = '''#!/bin/bash
+#PBS -N {}
 #PBS -S /bin/bash
-#PBS -l nodes={node_count}:ppn={cpu_count}{gpu_cfg_str}{cuda_cfg_str},mem={ram},walltime={walltime}
+#PBS -l nodes={}:ppn={}{}{},mem={},walltime={}
 #PBS -q default-cpu
 #PBS -m a
-#PBS -M {cfg.platform.username}@informatik.uni-freiburg.de
+#PBS -M {}@informatik.uni-freiburg.de
 #PBS -j oe
 
 # For interactive jobs: #PBS -I
@@ -105,7 +109,7 @@ pip3 install -r {cfg.platform.path_git_repo}/requirements.txt
 
 echo $(curl google.com)
 
-CUDA_HOME={cfg.platform.path_cuda}
+CUDA_HOME={}
 PATH=${{CUDA_HOME}}/bin:${{PATH}}
 LD_LIBRARY_PATH=${{CUDA_HOME}}/lib64:${{LD_LIBRARY_PATH}}
 export PATH
@@ -117,51 +121,59 @@ echo LD_LIBRARY_PATH=${{LD_LIBRARY_PATH}}
 echo CUDA_HOME=${{CUDA_HOME}}
 
 # Setup Repository
-if [[ -d "{cfg.platform.path_git_repo}" ]]; then
-    echo "OD3D is already cloned to {cfg.platform.path_git_repo}."
+if [[ -d "{}" ]]; then
+    echo "OD3D is already cloned to {}."
 else
-    git clone {cfg.platform.url_git_repo} {cfg.platform.path_git_repo}
+    git clone {} {}
 fi
 
-while [[ -e "{cfg.platform.path_git_repo}/installing.txt" ]]; do
+while [[ -e "{}/installing.txt" ]]; do
     sleep 3  
     echo "waiting for installing.txt file to disappear."
 done
 
-touch "{cfg.platform.path_git_repo}/installing.txt"
+touch "{}/installing.txt"
 
-cd {cfg.platform.path_git_repo}
+cd {}
 
-{pull_git_repo_cmds_str}
-{pull_git_repo_submodules_cmds_str}
+{}
+{}
 
 # Install OD3D in venv
 VENV_NAME=venv310
 export VENV_NAME
 if [[ -d "${{VENV_NAME}}" ]]; then
-    echo "Venv already exists at {cfg.platform.path_git_repo}/${{VENV_NAME}}."
-    source {cfg.platform.path_git_repo}/${{VENV_NAME}}/bin/activate
+    echo "Venv already exists at {}/${{VENV_NAME}}."
+    source {}/${{VENV_NAME}}/bin/activate
 else
-    echo "Creating venv at {cfg.platform.path_git_repo}/${{VENV_NAME}}."
-    python3 -m venv {cfg.platform.path_git_repo}/${{VENV_NAME}}
-    source {cfg.platform.path_git_repo}/${{VENV_NAME}}/bin/activate
+    echo "Creating venv at {}/${{VENV_NAME}}."
+    python3 -m venv {}/${{VENV_NAME}}
+    source {}/${{VENV_NAME}}/bin/activate
 fi
 
-{install_git_repo_cmds_str}
+{}
 
-rm "{cfg.platform.path_git_repo}/installing.txt"
+rm "{}/installing.txt"
 
-python pull.py {cfg.platform.path_html}
+python pull.py {}
 
 #PYTHONUNBUFFERED=1 
 #CUDA_VISIBLE_DEVICES=1
 
 exit 0
-        '''
+        '''.format(job_name, str(node_count), str(cpu_count), gpu_cfg_str, cuda_cfg_str, ram, walltime,
+                   cfg.platform.username,
+                   cfg.platform.path_cuda,cfg.platform.path_git_repo,cfg.platform.path_git_repo,
+                   cfg.platform.url_git_repo,cfg.platform.path_git_repo,cfg.platform.path_git_repo,
+                   cfg.platform.path_git_repo,cfg.platform.path_git_repo,pull_git_repo_cmds_str,pull_git_repo_submodules_cmds_str,
+                   cfg.platform.path_git_repo,cfg.platform.path_git_repo,cfg.platform.path_git_repo,
+                   cfg.platform.path_git_repo,cfg.platform.path_git_repo,install_git_repo_cmds_str,
+                   cfg.platform.path_git_repo,cfg.platform.path_html)
         rsh.write(script_as_string)
+
     #subprocess.run(f'scp {tmp_script_fpath} torque:{tmp_script_fpath}', capture_output=True, shell=True)
     #subprocess.run(f'scp {tmp_config_fpath} torque:{tmp_config_fpath}', capture_output=True, shell=True)
-    subprocess.run(f'ssh torque "cd torque_jobs && qsub {remote_tmp_script_fpath}"', capture_output=True, shell=True)
+    subprocess.run('ssh torque "cd torque_jobs && qsub ' + remote_tmp_script_fpath + '"', capture_output=True, shell=True)
 
 def main():
     bench_single_method_torque()
