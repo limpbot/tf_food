@@ -284,6 +284,13 @@ def get_weather_desc():
     # Get the detailed weather status as a string
     detailed_status = weather.detailed_status
     print("Detailed weather status:", detailed_status)
+    forecaster = mgr.forecast_at_coords(lat, lon)
+    from pyowm.utils import timestamps
+    from datetime import datetime
+    datetime.today()
+    time_lunch = timestamps.now() + timestamps.timedelta(hours=5) # 7 + 5 = 12
+    detailed_status = forecaster.get_weather_at(time_lunch).detailed_status
+    print("Detailed weather forecast:", detailed_status)
     return detailed_status
 
 if CREATE_IMAGES:
