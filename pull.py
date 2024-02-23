@@ -230,7 +230,7 @@ for mensa in dict_mensa_essen.keys():
         html_text += f"""
         <li>
             {essen} ({date}) <br>
-            <img width="25%" src="./{todays_date}_{mensa}_{i}.jpg" alt="Local Image">
+            <img width="40%" src="./{todays_date}_{mensa}_{i}.jpg" alt="Local Image">
             <br>
         </li>
         """
