@@ -284,7 +284,7 @@ def get_weather_desc():
     # Get the detailed weather status as a string
     detailed_status = weather.detailed_status
     print("Detailed weather status:", detailed_status)
-    forecaster = mgr.forecast_at_coords(lat, lon)
+    forecaster = mgr.forecast_at_coords(lat, lon, '3h')
     from pyowm.utils import timestamps
     from datetime import datetime
     datetime.today()
