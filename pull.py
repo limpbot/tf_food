@@ -3,6 +3,7 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 # pip install requests
 # pip install bs4
+# pip install pyowm
 import requests
 from bs4 import BeautifulSoup
 import datetime
