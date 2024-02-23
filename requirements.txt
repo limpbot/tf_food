@@ -7,3 +7,4 @@ omegaconf
 torch
 torchaudio
 torchvision
+pyowm

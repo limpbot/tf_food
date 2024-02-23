@@ -8,6 +8,7 @@ path_cuda = "/misc/software/cuda/cuda-11.7"
 path_home = "/home/" + lmb_username
 path_logs = "/home/" + lmb_username
 path_html = '/home/' + lmb_username + '/tools-and-services/tf_food/html/'
+# path_html = '/misc/lmbweb/essen/' # problem torque cannot reach this path
 
 class ConfigPlatform():
     link = "torque"

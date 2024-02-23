@@ -10,6 +10,7 @@ import re
 import sys
 from pathlib import Path
 
+CREATE_IMAGES = True
 if len(sys.argv) > 1:
     PATH_HTML = sys.argv[1]
 else:
@@ -17,7 +18,7 @@ else:
 
 def get_todays_date():
     now = datetime.datetime.now()
-    timestamp = now.strftime("%d-%m") # _%H-%M-%S
+    timestamp = now.strftime("%d.%m.") # _%H-%M-%S
     return timestamp
 
 
@@ -83,20 +84,24 @@ menu_elements = soup.select('.menu-tagesplan')
 
 swfr_flugplatz_essen = []
 swfr_flugplatz_date = []
-for element in menu_elements:
-    essen_weekday = element.find('h3').get_text()
-    if todays_weekday not in essen_weekday:
-        continue
-    extra_text_elements = element.select('small.extra-text')
 
-    for element_essen in extra_text_elements:
-        try:
-            essen = element_essen.get_text(separator=', ')
-            swfr_flugplatz_essen.append(essen)
-            date = essen_weekday.split(' ')[-1]
-            swfr_flugplatz_date.append(date)
-        except Exception as e:
-            pass
+try:
+    for element in menu_elements:
+        essen_weekday = element.find('h3').get_text()
+        if todays_weekday not in essen_weekday:
+            continue
+        extra_text_elements = element.select('small.extra-text')
+
+        for element_essen in extra_text_elements:
+            try:
+                essen = element_essen.get_text(separator=', ')
+                swfr_flugplatz_essen.append(essen)
+                date = essen_weekday.split(' ')[-1]
+                swfr_flugplatz_date.append(date)
+            except Exception as e:
+                pass
+except Exception as e:
+    pass
 
 if len(swfr_flugplatz_essen) > 0:
     dict_mensa_essen['SWFR Flugplatz'] = swfr_flugplatz_essen
@@ -113,29 +118,34 @@ soup = BeautifulSoup(html_content, 'html.parser')
 tab_par_element = soup.select('.tabPar')[0] #.first()
 rows = tab_par_element.find_all('tr')
 
-week_monday_day_in_month, week_monday_month = re.match('([0-9]+)[^A-Za-z]* ([A-Za-z]+) .*', tab_par_element.find_all('h4')[0].get_text() + ' Dezember ').groups()
-week_monday_month = german_month_names[week_monday_month]
 
 fraunhofer_ipm_essen = []
 fraunhofer_ipm_date = []
-for row in rows:
-    essens_infos = row.find_all('td')
 
-    try:
-        weekday = essens_infos[0].get_text()
-        if todays_weekday not in weekday:
-            continue
+try:
+    week_monday_day_in_month, week_monday_month = re.match('([0-9]+)[^A-Za-z]* ([A-Za-z]+) .*', tab_par_element.find_all('h4')[0].get_text() + ' Dezember ').groups()
+    week_monday_month = german_month_names[week_monday_month]
 
-        for essen_info in essens_infos[1].find_all('li'):
-            date = datetime.datetime(year=int(get_todays_year()), month=week_monday_month, day=int(week_monday_day_in_month)) + datetime.timedelta(days=german_weekdays_offsets[weekday.split(' ')[0]])
-            date = date.strftime("%d.%m.")
-            fraunhofer_ipm_date.append(date)
-            essen = essen_info.get_text().replace('\xa0', '')
-            essen = re.sub(r'\[.*?\]', '', essen)
-            fraunhofer_ipm_essen.append(essen)
-    except Exception as e:
-        pass
 
+    for row in rows:
+        essens_infos = row.find_all('td')
+
+        try:
+            weekday = essens_infos[0].get_text()
+            if todays_weekday not in weekday:
+                continue
+
+            for essen_info in essens_infos[1].find_all('li'):
+                date = datetime.datetime(year=int(get_todays_year()), month=week_monday_month, day=int(week_monday_day_in_month)) + datetime.timedelta(days=german_weekdays_offsets[weekday.split(' ')[0]])
+                date = date.strftime("%d.%m.")
+                fraunhofer_ipm_date.append(date)
+                essen = essen_info.get_text().replace('\xa0', '')
+                essen = re.sub(r'\[.*?\]', '', essen)
+                fraunhofer_ipm_essen.append(essen)
+        except Exception as e:
+            pass
+except Exception as e:
+    pass
 if len(fraunhofer_ipm_essen) > 0:
     dict_mensa_essen['Fraunhofer IPM'] = fraunhofer_ipm_essen
     dict_mensa_date['Fraunhofer IPM'] = fraunhofer_ipm_date
@@ -147,12 +157,32 @@ else:
 # pip install torch
 # pip install --upgrade diffusers transformers accelerate
 
+# <meta http-equiv="Content-Security-Policy" content="style-src 'self' 'https://windy.com;'" />
+# <script src="leaflet.js"></script>
+# <script src="libBoot.js"></script>
+# <script src="script.js"></script>
+#     <meta HTTP-EQUIV="Content-Security-Policy" content="default-src 'self' https://*; style-src 'self' https://*; frame-src 'self' https://*;" />
+#     <meta HTTP-EQUIV="Content-Security-Policy" content="default-src *; style-src *; frame-src *; script-src *;" />
+#     <meta HTTP-EQUIV="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' *; style-src 'self' 'unsafe-inline' 'unsafe-eval' *; frame-src 'self' 'unsafe-inline' 'unsafe-eval' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' *;" />
+
+html_weather_req = requests.get(url="https://embed.windy.com/embed2.html?lat=48.000&lon=7.850&zoom=12&level=surface&overlay=rain&product=ecmwf&menu=&message=&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=km%2Fh&metricTemp=%C2%B0C&radarRange=-1")
+html_weather= html_weather_req.content
+with open('weather.html', 'wb') as f:
+    f.write(html_weather)
+
 
 html_text = """
 <!DOCTYPE html>
 <html>
 <head>
     <title>Today's Mensa Options</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
+    />
+
+    <meta http-equiv="refresh" CONTENT="30"> <! -- This is to force refresh of this page every 30 seconds>
+    
     <style>
         /* Apply CSS to style the <li> elements */
         
@@ -181,6 +211,8 @@ html_text = """
             margin-top: 50px;
           }
     </style>
+    
+
 </head>
 <body>
 
@@ -207,20 +239,26 @@ for mensa in dict_mensa_essen.keys():
 html_text += f"""
     </div>
     
-    <div>
-  <iframe
-    title="Weather Radar Map"
-    src="https://embed.windy.com/embed2.html?lat=48.000&lon=7.850&zoom=12&level=surface&overlay=rain&product=ecmwf&menu=&message=&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=km%2Fh&metricTemp=%C2%B0C&radarRange=-1"
-    width="100%"
-    height="450px"
-  ></iframe>
-</div>
+    <img width="100%" src="./{todays_date}_weather.jpg" alt="Local Image">
+    
     </body>
 </html>
         """
+#     <embed type="text/html">{html_weather}</embed>
+#     <div>
+#       <iframe
+#         title="Weather Radar Map"
+#         src="https://embed.windy.com/embed2.html?lat=48.000&lon=7.850&zoom=12&level=surface&overlay=rain&product=ecmwf&menu=&message=&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=km%2Fh&metricTemp=%C2%B0C&radarRange=-1"
+#         width="100%"
+#         height="450px"
+#       ></iframe>
+#     </div>
+
+# <div id="windy"></div>
 
 # Convert special characters to HTML entities
-html_encoded = html_text.replace("ä", "&auml;").replace("ö", "&ouml;").replace("ü", "&uuml;").replace("ß", "&szlig;").replace("»", "&raquo;").replace("«", "&laquo;")
+html_encoded = html_text.replace("Ä", "&Auml;").replace("Ö", "&Ouml;").replace("Ü", "&Uuml;").replace("ä", "&auml;")\
+    .replace("ö", "&ouml;").replace("ü", "&uuml;").replace("ß", "&szlig;").replace("»", "&raquo;").replace("«", "&laquo;")
 
 file_path = "index.html"  # Specify the file path
 
@@ -232,15 +270,34 @@ with open(file_path, 'w') as file:
 from diffusers import StableDiffusionPipeline
 import torch
 
-model_id = "dreamlike-art/dreamlike-photoreal-2.0"
-pipe = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16)
-pipe = pipe.to("cuda")
+def get_weather_desc():
+    import pyowm
+    # Replace 'YOUR_API_KEY' with your actual OpenWeatherMap API key
+    owm = pyowm.OWM('2f1ef2b45af97ec27f84797fc2581724')
+    # Set the desired location using coordinates
+    lat = 48.000
+    lon = 7.850
+    mgr = owm.weather_manager()
+    # Get the current weather at the specified location
+    weather = mgr.weather_at_coords(lat, lon).weather
+    # Get the detailed weather status as a string
+    detailed_status = weather.detailed_status
+    print("Detailed weather status:", detailed_status)
+    return detailed_status
 
-for mensa in dict_mensa_essen.keys():
-    for i, essen in enumerate(dict_mensa_essen[mensa]):
-        prompt = "photo, a church in the middle of a field of crops, bright cinematic lighting, gopro, fisheye lens"
-        image = pipe(essen).images[0]
-        image.save(f"./{todays_date}_{mensa}_{i}.jpg")
+if CREATE_IMAGES:
+    model_id = "dreamlike-art/dreamlike-photoreal-2.0"
+    pipe = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16)
+    pipe = pipe.to("cuda")
+
+    for mensa in dict_mensa_essen.keys():
+        for i, essen in enumerate(dict_mensa_essen[mensa]):
+            prompt = "photo, a church in the middle of a field of crops, bright cinematic lighting, gopro, fisheye lens"
+            image = pipe(essen).images[0]
+            image.save(f"./{todays_date}_{mensa}_{i}.jpg")
+
+    image = pipe(f'{get_weather_desc()} weather').images[0]
+    image.save(f"./{todays_date}_weather.jpg")
 
 
 import subprocess
@@ -276,6 +333,8 @@ if not Path(PATH_HTML).exists():
     Path(PATH_HTML).mkdir(parents=True)
 
 run_cmd(f'cp ./index.html {PATH_HTML}', live=True, logger=logger)
+run_cmd(f'cp ./*.js {PATH_HTML}', live=True, logger=logger)
+
 run_cmd(f'rm {PATH_HTML}*.jpg', live=True, logger=logger)
 
 
@@ -283,5 +342,7 @@ for mensa in dict_mensa_essen.keys():
     for i, essen in enumerate(dict_mensa_essen[mensa]):
         run_cmd(f'cp "./{todays_date}_{mensa}_{i}.jpg" {PATH_HTML}', live=True, logger=logger)
 
+run_cmd(f'cp "./{todays_date}_weather.jpg" {PATH_HTML}', live=True, logger=logger)
+
 run_cmd(f'rm *.jpg', live=True, logger=logger)
-run_cmd(f'rm *.html', live=True, logger=logger)
+run_cmd(f'rm index.html', live=True, logger=logger)
