@@ -4,6 +4,7 @@ logging.basicConfig(level=logging.INFO)
 # pip install requests
 # pip install bs4
 # pip install pyowm
+# pip install deep-translator
 import requests
 from bs4 import BeautifulSoup
 import datetime
@@ -303,6 +304,10 @@ def get_weather_desc():
     return detailed_status
 
 if CREATE_IMAGES:
+    from deep_translator import GoogleTranslator
+    # Use any translator you like, in this example GoogleTranslator
+    translator = GoogleTranslator(source='de', target='en')
+
     model_id = "dreamlike-art/dreamlike-photoreal-2.0"
     pipe = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16)
     pipe = pipe.to("cuda")
@@ -310,10 +315,14 @@ if CREATE_IMAGES:
     for mensa in dict_mensa_essen.keys():
         for i, essen in enumerate(dict_mensa_essen[mensa]):
             prompt = "photo, a church in the middle of a field of crops, bright cinematic lighting, gopro, fisheye lens"
-            image = pipe(essen).images[0]
+            logger.info(essen)
+            essen_en = translator.translate(essen)
+            logger.info(essen_en)
+            image = pipe(essen_en).images[0]
             image.save(f"./{todays_date}_{mensa}_{i}.jpg")
 
-    image = pipe(f'{get_weather_desc()} weather').images[0]
+    weather_desc = get_weather_desc()
+    image = pipe(f'{weather_desc} weather').images[0]
     image.save(f"./{todays_date}_weather.jpg")
 
 
