@@ -100,9 +100,12 @@ try:
                 date = essen_weekday.split(' ')[-1]
                 swfr_flugplatz_date.append(date)
             except Exception as e:
-                pass
+                logger.info('Exception for SWFR Flugplatz')
+                logger.info(e)
 except Exception as e:
-    pass
+    logger.info('Exception for SWFR Flugplatz')
+    logger.info(e)
+
 
 if len(swfr_flugplatz_essen) > 0:
     dict_mensa_essen['SWFR Flugplatz'] = swfr_flugplatz_essen
@@ -124,7 +127,11 @@ fraunhofer_ipm_essen = []
 fraunhofer_ipm_date = []
 
 try:
-    week_monday_day_in_month, week_monday_month = re.match('([0-9]+)[^A-Za-z]* ([A-Za-z]+) .*', tab_par_element.find_all('h4')[0].get_text() + ' Dezember ').groups()
+    week_monday_day_in_month, week_monday_month = re.match('([0-9]+)\. ([A-Za-z]+)\..*', tab_par_element.find_all('h4')[0].get_text()).groups() #  + ' Dezember '
+    for german_month in german_month_names.keys():
+        if german_month.startswith(week_monday_month):
+            week_monday_month = german_month
+            break
     week_monday_month = german_month_names[week_monday_month]
 
 
@@ -144,9 +151,11 @@ try:
                 essen = re.sub(r'\[.*?\]', '', essen)
                 fraunhofer_ipm_essen.append(essen)
         except Exception as e:
-            pass
+            logger.info('Exception for Frauhofer IPM.')
+            logger.info(e)
 except Exception as e:
-    pass
+    logger.info('Exception for Frauhofer IPM.')
+    logger.info(e)
 if len(fraunhofer_ipm_essen) > 0:
     dict_mensa_essen['Fraunhofer IPM'] = fraunhofer_ipm_essen
     dict_mensa_date['Fraunhofer IPM'] = fraunhofer_ipm_date
