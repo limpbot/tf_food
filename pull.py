@@ -12,7 +12,9 @@ import re
 import sys
 from pathlib import Path
 
+ONLY_COPY_HTML = False
 CREATE_IMAGES = True
+
 if len(sys.argv) > 1:
     PATH_HTML = sys.argv[1]
 else:
@@ -165,6 +167,47 @@ else:
     dict_mensa_date['Fraunhofer IPM'] = [get_todays_date()]
 
 
+url = 'https://www.swfr.de/essen/mensen-cafes-speiseplaene/freiburg/mensa-institutsviertel'
+response = requests.get(url)
+html_content = response.content
+
+soup = BeautifulSoup(html_content, 'html.parser')
+
+menu_elements = soup.select('.menu-tagesplan')
+
+swfr_insti_essen = []
+swfr_insti_date = []
+
+try:
+    for element in menu_elements:
+        essen_weekday = element.find('h3').get_text()
+        if todays_weekday not in essen_weekday:
+            continue
+        extra_text_elements = element.select('small.extra-text')
+        abendessen_elements = [True if 'Abendessen' in element_title.get_text() else False for element_title in element.select('h5')]
+        extra_text_elements = [element for i, element in enumerate(extra_text_elements) if abendessen_elements[i]]
+        for element_essen in extra_text_elements:
+            try:
+                essen = element_essen.get_text(separator=', ')
+                swfr_insti_essen.append(essen)
+                date = essen_weekday.split(' ')[-1]
+                swfr_insti_date.append(date)
+            except Exception as e:
+                logger.info('Exception for SWFR Institutsviertel Abendessen')
+                logger.info(e)
+except Exception as e:
+    logger.info('Exception for SWFR Institutsviertel Abendessen')
+    logger.info(e)
+
+
+if len(swfr_insti_essen) > 0:
+    dict_mensa_essen['SWFR Institutsviertel Abendessen'] = swfr_insti_essen
+    dict_mensa_date['SWFR Institutsviertel Abendessen'] = swfr_insti_date
+else:
+    dict_mensa_essen['SWFR Institutsviertel Abendessen'] = ['Empty plate.']
+    dict_mensa_date['SWFR Institutsviertel Abendessen'] = [get_todays_date()]
+
+
 # pip install torch
 # pip install --upgrade diffusers transformers accelerate
 
@@ -182,7 +225,7 @@ with open('weather.html', 'wb') as f:
     f.write(html_weather)
 
 
-html_text = """
+html_text = f"""
 <!DOCTYPE html>
 <html>
 <head>
@@ -197,7 +240,14 @@ html_text = """
     <style>
         /* Apply CSS to style the <li> elements */
         
-        ul.grid-list {
+        body {{
+            color: white; /* Text color */
+            background-image: url('./{todays_date}_weather.jpg');
+            background-size: cover; /* Optional - scales the image to cover the entire background */
+            /* Other background properties like background-position, background-repeat, etc., can also be used */
+        }}
+        
+        ul.grid-list {{
             list-style: none;
             padding: 0;
             margin: 0;
@@ -206,21 +256,23 @@ html_text = """
             gap: 10px;
             text-align: center;
             width: 100%;
-        }
+        }}
 
-        ul.grid-list li {
+        ul.grid-list li {{
             border: 1px solid #ccc;
             padding: 10px;
             text-align: center;
             width: 0.25fr;
-        }
-        .fancy-title {
-            
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Shadow to improve readability */
+            background-color: rgba(0, 0, 0, 0.5); /* Background color with transparency */
+        }}
+        .fancy-title {{
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Shadow to improve readability */
             font-size: 36px;
-            color: black;
             text-align: center;
             margin-top: 50px;
-          }
+            background-color: rgba(0, 0, 0, 0.5); /* Background color with transparency */
+          }}
     </style>
     
 
@@ -250,11 +302,15 @@ for mensa in dict_mensa_essen.keys():
 html_text += f"""
     </div>
     
-    <img width="100%" src="./{todays_date}_weather.jpg" alt="Local Image">
+    
     
     </body>
 </html>
         """
+
+# <img width="100%" src="./{todays_date}_weather.jpg" alt="Local Image">
+
+
 #     <embed type="text/html">{html_weather}</embed>
 #     <div>
 #       <iframe
@@ -361,14 +417,15 @@ if not Path(PATH_HTML).exists():
 run_cmd(f'cp ./index.html {PATH_HTML}', live=True, logger=logger)
 run_cmd(f'cp ./*.js {PATH_HTML}', live=True, logger=logger)
 
-run_cmd(f'rm {PATH_HTML}*.jpg', live=True, logger=logger)
+if not ONLY_COPY_HTML:
+
+    for mensa in dict_mensa_essen.keys():
+        for i, essen in enumerate(dict_mensa_essen[mensa]):
+            run_cmd(f'cp "./{todays_date}_{mensa}_{i}.jpg" {PATH_HTML}', live=True, logger=logger)
+
+    run_cmd(f'cp "./{todays_date}_weather.jpg" {PATH_HTML}', live=True, logger=logger)
 
 
-for mensa in dict_mensa_essen.keys():
-    for i, essen in enumerate(dict_mensa_essen[mensa]):
-        run_cmd(f'cp "./{todays_date}_{mensa}_{i}.jpg" {PATH_HTML}', live=True, logger=logger)
-
-run_cmd(f'cp "./{todays_date}_weather.jpg" {PATH_HTML}', live=True, logger=logger)
-
-run_cmd(f'rm *.jpg', live=True, logger=logger)
-run_cmd(f'rm index.html', live=True, logger=logger)
+    run_cmd(f'rm {PATH_HTML}*.jpg', live=True, logger=logger)
+    run_cmd(f'rm *.jpg', live=True, logger=logger)
+    run_cmd(f'rm index.html', live=True, logger=logger)
