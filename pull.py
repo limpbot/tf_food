@@ -114,7 +114,7 @@ if len(swfr_flugplatz_essen) > 0:
     dict_mensa_essen['SWFR Flugplatz'] = swfr_flugplatz_essen
     dict_mensa_date['SWFR Flugplatz'] = swfr_flugplatz_date
 else:
-    dict_mensa_essen['SWFR Flugplatz'] = ['Empty plate.']
+    dict_mensa_essen['SWFR Flugplatz'] = ['Leerer Teller.']
     dict_mensa_date['SWFR Flugplatz'] = [get_todays_date()]
 
 url = 'https://www.ipm.fraunhofer.de/de/ueber-fraunhofer-ipm/fraunhofer-ipm-kantine.html'
@@ -163,7 +163,7 @@ if len(fraunhofer_ipm_essen) > 0:
     dict_mensa_essen['Fraunhofer IPM'] = fraunhofer_ipm_essen
     dict_mensa_date['Fraunhofer IPM'] = fraunhofer_ipm_date
 else:
-    dict_mensa_essen['Fraunhofer IPM'] = ['Empty plate.']
+    dict_mensa_essen['Fraunhofer IPM'] = ['Leerer Teller.']
     dict_mensa_date['Fraunhofer IPM'] = [get_todays_date()]
 
 
@@ -204,7 +204,7 @@ if len(swfr_insti_essen) > 0:
     dict_mensa_essen['SWFR Institutsviertel Abendessen'] = swfr_insti_essen
     dict_mensa_date['SWFR Institutsviertel Abendessen'] = swfr_insti_date
 else:
-    dict_mensa_essen['SWFR Institutsviertel Abendessen'] = ['Empty plate.']
+    dict_mensa_essen['SWFR Institutsviertel Abendessen'] = ['Leerer Teller.']
     dict_mensa_date['SWFR Institutsviertel Abendessen'] = [get_todays_date()]
 
 
