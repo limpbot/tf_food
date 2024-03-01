@@ -417,15 +417,14 @@ if not Path(PATH_HTML).exists():
 run_cmd(f'cp ./index.html {PATH_HTML}', live=True, logger=logger)
 run_cmd(f'cp ./*.js {PATH_HTML}', live=True, logger=logger)
 
+
 if not ONLY_COPY_HTML:
 
+    run_cmd(f'rm {PATH_HTML}*.jpg', live=True, logger=logger)
     for mensa in dict_mensa_essen.keys():
         for i, essen in enumerate(dict_mensa_essen[mensa]):
             run_cmd(f'cp "./{todays_date}_{mensa}_{i}.jpg" {PATH_HTML}', live=True, logger=logger)
-
     run_cmd(f'cp "./{todays_date}_weather.jpg" {PATH_HTML}', live=True, logger=logger)
 
-
-    run_cmd(f'rm {PATH_HTML}*.jpg', live=True, logger=logger)
     run_cmd(f'rm *.jpg', live=True, logger=logger)
     run_cmd(f'rm index.html', live=True, logger=logger)
