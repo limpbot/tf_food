@@ -69,7 +69,7 @@ def bench_single_method_torque():
         walltime = cfg.platform.walltime
 
         gpu_cfg_str = ':gpus=' + str(gpu_count) if gpu_count > 0 else ""
-        cuda_cfg_str = ':nvidiaMinCC89' if gpu_count > 0 else "" # nvidiaMinCC75 , nvidiaMinCC86, nvidiaMinCC89
+        cuda_cfg_str = ':nvidiaMinCC75' if gpu_count > 0 else "" # nvidiaMinCC75 , nvidiaMinCC86, nvidiaMinCC89
 
         if cfg.platform.pull_git_repo:
             pull_git_repo_cmds_str = '''
