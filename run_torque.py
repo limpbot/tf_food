@@ -23,7 +23,7 @@ class ConfigPlatform():
     username = lmb_username
     gpu_count = 1
     cpu_count = 8
-    ram = "40gb"
+    ram = "10gb"
     walltime = "24:00:00"
 
 class ConfigPlatformLocal():
