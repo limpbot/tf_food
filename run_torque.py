@@ -174,7 +174,7 @@ exit 0
 
     #subprocess.run(f'scp {tmp_script_fpath} torque:{tmp_script_fpath}', capture_output=True, shell=True)
     #subprocess.run(f'scp {tmp_config_fpath} torque:{tmp_config_fpath}', capture_output=True, shell=True)
-    subprocess.run('ssh torque "cd torque_jobs && qsub ' + remote_tmp_script_fpath + '"', capture_output=True, shell=True)
+    subprocess.run('ssh torque "qsub ' + remote_tmp_script_fpath + '"', capture_output=True, shell=True)
 
 def main():
     bench_single_method_torque()
