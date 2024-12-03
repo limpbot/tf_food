@@ -130,7 +130,7 @@ fraunhofer_ipm_essen = []
 fraunhofer_ipm_date = []
 
 try:
-    week_monday_day_in_month, _, week_monday_month = re.match('([0-9]+)\.([^A-Z]+)([\w]+) .*', tab_par_element.find_all('h4')[0].get_text()).groups() #  + ' Dezember '
+    week_monday_day_in_month, _, week_monday_month = re.match(r'([0-9]+)\.([^A-Z]+)([\w]+).*', tab_par_element.find_all('h4')[0].get_text()).groups() #  + ' Dezember '
     for german_month in german_month_names.keys():
         if german_month.startswith(week_monday_month):
             week_monday_month = german_month
