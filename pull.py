@@ -120,54 +120,54 @@ else:
 
 
 
-url = 'https://www.ipm.fraunhofer.de/de/ueber-fraunhofer-ipm/fraunhofer-ipm-kantine.html'
-response = requests.get(url)
-html_content = response.content
-
-soup = BeautifulSoup(html_content, 'html.parser')
-#tab_par_element = soup.select('.tabPar')[0] #.first()
-#rows = tab_par_element.find_all('tr')
-rows = [] # IPM is closed since 27.03
-
-fraunhofer_ipm_essen = []
-fraunhofer_ipm_date = []
-
-try:
-    week_monday_day_in_month, _, week_monday_month = re.match(r'([0-9]+)\.([^A-Z]+)([\w]+).*', tab_par_element.find_all('h4')[0].get_text()).groups() #  + ' Dezember '
-    for german_month in german_month_names.keys():
-        if german_month.startswith(week_monday_month):
-            week_monday_month = german_month
-            break
-    week_monday_month = german_month_names[week_monday_month]
-
-
-    for row in rows:
-        essens_infos = row.find_all('td')
-
-        try:
-            weekday = essens_infos[0].get_text()
-            if todays_weekday not in weekday:
-                continue
-
-            for essen_info in essens_infos[1].find_all('li'):
-                date = datetime.datetime(year=int(get_todays_year()), month=week_monday_month, day=int(week_monday_day_in_month)) + datetime.timedelta(days=german_weekdays_offsets[weekday.split(' ')[0]])
-                date = date.strftime("%d.%m.")
-                fraunhofer_ipm_date.append(date)
-                essen = essen_info.get_text().replace('\xa0', '')
-                essen = re.sub(r'\[.*?\]', '', essen)
-                fraunhofer_ipm_essen.append(essen)
-        except Exception as e:
-            logger.info('Exception for Frauhofer IPM.')
-            logger.info(e)
-except Exception as e:
-    logger.info('Exception for Frauhofer IPM.')
-    logger.info(e)
-if len(fraunhofer_ipm_essen) > 0:
-    dict_mensa_essen['Fraunhofer IPM'] = fraunhofer_ipm_essen
-    dict_mensa_date['Fraunhofer IPM'] = fraunhofer_ipm_date
-else:
-    dict_mensa_essen['Fraunhofer IPM'] = ['Leerer Teller.']
-    dict_mensa_date['Fraunhofer IPM'] = [get_todays_date()]
+# url = 'https://www.ipm.fraunhofer.de/de/ueber-fraunhofer-ipm/fraunhofer-ipm-kantine.html'
+# response = requests.get(url)
+# html_content = response.content
+#
+# soup = BeautifulSoup(html_content, 'html.parser')
+# #tab_par_element = soup.select('.tabPar')[0] #.first()
+# #rows = tab_par_element.find_all('tr')
+# rows = [] # IPM is closed since 27.03
+#
+# fraunhofer_ipm_essen = []
+# fraunhofer_ipm_date = []
+#
+# try:
+#     week_monday_day_in_month, _, week_monday_month = re.match(r'([0-9]+)\.([^A-Z]+)([\w]+).*', tab_par_element.find_all('h4')[0].get_text()).groups() #  + ' Dezember '
+#     for german_month in german_month_names.keys():
+#         if german_month.startswith(week_monday_month):
+#             week_monday_month = german_month
+#             break
+#     week_monday_month = german_month_names[week_monday_month]
+#
+#
+#     for row in rows:
+#         essens_infos = row.find_all('td')
+#
+#         try:
+#             weekday = essens_infos[0].get_text()
+#             if todays_weekday not in weekday:
+#                 continue
+#
+#             for essen_info in essens_infos[1].find_all('li'):
+#                 date = datetime.datetime(year=int(get_todays_year()), month=week_monday_month, day=int(week_monday_day_in_month)) + datetime.timedelta(days=german_weekdays_offsets[weekday.split(' ')[0]])
+#                 date = date.strftime("%d.%m.")
+#                 fraunhofer_ipm_date.append(date)
+#                 essen = essen_info.get_text().replace('\xa0', '')
+#                 essen = re.sub(r'\[.*?\]', '', essen)
+#                 fraunhofer_ipm_essen.append(essen)
+#         except Exception as e:
+#             logger.info('Exception for Frauhofer IPM.')
+#             logger.info(e)
+# except Exception as e:
+#     logger.info('Exception for Frauhofer IPM.')
+#     logger.info(e)
+# if len(fraunhofer_ipm_essen) > 0:
+#     dict_mensa_essen['Fraunhofer IPM'] = fraunhofer_ipm_essen
+#     dict_mensa_date['Fraunhofer IPM'] = fraunhofer_ipm_date
+# else:
+#     dict_mensa_essen['Fraunhofer IPM'] = ['Leerer Teller.']
+#     dict_mensa_date['Fraunhofer IPM'] = [get_todays_date()]
 
 
 url = 'https://www.swfr.de/essen/mensen-cafes-speiseplaene/freiburg/mensa-institutsviertel'
@@ -255,7 +255,7 @@ html_text = f"""
             padding: 0;
             margin: 0;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 0.5fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 0.5fr));
             gap: 10px;
             text-align: center;
             width: 100%;
@@ -265,7 +265,7 @@ html_text = f"""
             border: 1px solid #ccc;
             padding: 10px;
             text-align: center;
-            width: 0.25fr;
+            width: 1fr;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Shadow to improve readability */
             background-color: rgba(0, 0, 0, 0.5); /* Background color with transparency */
         }}
