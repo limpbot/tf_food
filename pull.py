@@ -78,7 +78,8 @@ dict_mensa_essen = {}
 dict_mensa_date = {}
 
 
-url = 'https://www.swfr.de/essen/mensen-cafes-speiseplaene/freiburg/mensa-flugplatz'
+# url = 'https://www.swfr.de/essen/mensen-cafes-speiseplaene/freiburg/mensa-flugplatz'
+url = 'https://www.swfr.de/essen/mensen-cafes-speiseplaene/freiburg/mensa-flugplatz-cafe-flugplatz'
 response = requests.get(url)
 html_content = response.content
 
@@ -117,14 +118,16 @@ else:
     dict_mensa_essen['SWFR Flugplatz'] = ['Leerer Teller.']
     dict_mensa_date['SWFR Flugplatz'] = [get_todays_date()]
 
+
+
 url = 'https://www.ipm.fraunhofer.de/de/ueber-fraunhofer-ipm/fraunhofer-ipm-kantine.html'
 response = requests.get(url)
 html_content = response.content
 
 soup = BeautifulSoup(html_content, 'html.parser')
-tab_par_element = soup.select('.tabPar')[0] #.first()
-rows = tab_par_element.find_all('tr')
-
+#tab_par_element = soup.select('.tabPar')[0] #.first()
+#rows = tab_par_element.find_all('tr')
+rows = [] # IPM is closed since 27.03
 
 fraunhofer_ipm_essen = []
 fraunhofer_ipm_date = []
