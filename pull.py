@@ -305,14 +305,45 @@ for mensa in dict_mensa_essen.keys():
 html_text += f"""
     </div>
     
-    
-    
+    <div id="status-container" style="display: none; position: fixed; bottom: 0; width: 100%; background: rgba(0,0,0,0.6); color: white; text-align: center; padding: 10px; font-size: 14px;"></div>
+
+    <script>
+    function fetchStatus() {{
+      fetch('http://localhost:8765/status')
+        .then(response => response.text())
+        .then(data => {{
+          const container = document.getElementById('status-container');
+          container.textContent = data;
+          container.style.display = 'block';
+        }})
+        .catch(() => {{
+          // Do nothing if fetch fails
+        }});
+    }}
+    setInterval(fetchStatus, 250);
+    </script>
+
+
     </body>
 </html>
         """
 
 # <img width="100%" src="./{todays_date}_weather.jpg" alt="Local Image">
 
+"""
+    <script>
+    fetch('http://localhost:8765/status')
+      .then(response => response.text())
+      .then(data => {{
+        const container = document.getElementById('status-container');
+        container.textContent = data;
+        container.style.display = 'block';
+      }})
+      .catch(() => {{
+        // Do nothing if the local server is not running
+      }});
+    </script>
+"""
 
 #     <embed type="text/html">{html_weather}</embed>
 #     <div>
