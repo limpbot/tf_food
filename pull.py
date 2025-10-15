@@ -119,6 +119,48 @@ else:
     dict_mensa_date['SWFR Flugplatz'] = [get_todays_date()]
 
 
+####
+
+url = 'https://www.swfr.de/essen/mensen-cafes-speiseplaene/freiburg/fraunhofer-institut'
+response = requests.get(url)
+html_content = response.content
+
+soup = BeautifulSoup(html_content, 'html.parser')
+
+menu_elements = soup.select('.menu-tagesplan')
+
+swfr_flugplatz_essen = []
+swfr_flugplatz_date = []
+
+try:
+    for element in menu_elements:
+        essen_weekday = element.find('h3').get_text()
+        if todays_weekday not in essen_weekday:
+            continue
+        extra_text_elements = element.select('small.extra-text')
+
+        for element_essen in extra_text_elements:
+            try:
+                essen = element_essen.get_text(separator=', ')
+                swfr_flugplatz_essen.append(essen)
+                date = essen_weekday.split(' ')[-1]
+                swfr_flugplatz_date.append(date)
+            except Exception as e:
+                logger.info('Exception for SWFR Flugplatz')
+                logger.info(e)
+except Exception as e:
+    logger.info('Exception for SWFR Flugplatz')
+    logger.info(e)
+
+
+if len(swfr_flugplatz_essen) > 0:
+    dict_mensa_essen['Fraunhofer Institut'] = swfr_flugplatz_essen
+    dict_mensa_date['Fraunhofer Institut'] = swfr_flugplatz_date
+else:
+    dict_mensa_essen['Fraunhofer Institut'] = ['Leerer Teller.']
+    dict_mensa_date['Fraunhofer Institut'] = [get_todays_date()]
+
+
 
 # url = 'https://www.ipm.fraunhofer.de/de/ueber-fraunhofer-ipm/fraunhofer-ipm-kantine.html'
 # response = requests.get(url)
@@ -358,8 +400,11 @@ html_text += f"""
 # <div id="windy"></div>
 
 # Convert special characters to HTML entities
-html_encoded = html_text.replace("Ä", "&Auml;").replace("Ö", "&Ouml;").replace("Ü", "&Uuml;").replace("ä", "&auml;")\
-    .replace("ö", "&ouml;").replace("ü", "&uuml;").replace("ß", "&szlig;").replace("»", "&raquo;").replace("«", "&laquo;")
+html_encoded = (html_text.replace("Ä", "&Auml;").replace("Ö", "&Ouml;")
+                .replace("Ü", "&Uuml;").replace("ä", "&auml;")
+                .replace("ö", "&ouml;").replace("ü", "&uuml;")
+                .replace("ß", "&szlig;").replace("»", "&raquo;")
+                .replace("«", "&laquo;").replace("é", "&eacute;"))
 
 file_path = "index.html"  # Specify the file path
 
