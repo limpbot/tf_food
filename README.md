@@ -58,3 +58,21 @@ vlc --intf dummy swr3-radio-100.m3u
 vlc --intf dummy file_example_MP3_700KB.mp3
 
 ```
+
+
+Please adapt the script example_slurm.sh
+a) virtual environment (probably automatic setup if not there)
+b) username
+c) gpus, cpus
+d) output log directory
+e) slurm partition
+    1. lmb_gpu-rtx2080 : usually empty, only 3 slots
+    2. lmbdlc_gpu-rtx2080 : often pending (but eventually it will work)
+    3. alldlc_gpu-rtx3080 : usually empty (actually not anymore)
+    4. alldlc_gpu-rtx2080 : biggest cluster
+    5. tflmb_gpu-rtx3090: lmb gpu (debugging)
+    6. tflmb_gpu-1080ti: lmb gpu (debugging)
+    tflmb_gpu-rtx3090
+    tflmb_gpu-1080ti
+    alldlc2_gpu-l40s
+    lmbdlc2_gpu-l40s
